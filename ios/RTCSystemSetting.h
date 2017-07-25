@@ -18,4 +18,6 @@
 
 @interface RCTSystemSetting : RCTEventEmitter <RCTBridgeModule>
 
+@property (nonatomic, strong) UISlider *volumeSlider;
+
 @end

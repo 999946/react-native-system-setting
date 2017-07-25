@@ -25,15 +25,22 @@ RCT_EXPORT_METHOD(setBrightness:(float)val){
 }
 
 RCT_EXPORT_METHOD(getBrightness:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
-    resolve([NSNumber numberWithDouble:[UIScreen mainScreen].brightness]);
+    resolve([NSNumber numberWithFloat:[UIScreen mainScreen].brightness]);
 }
 
 RCT_EXPORT_METHOD(setVolume:(float)val){
-    [[MPMusicPlayerController applicationMusicPlayer] setVolume:val];
+    if(self.volumeSlider) {
+        [self.volumeSlider setValue:1.0f animated:NO];
+    }
 }
 
 RCT_EXPORT_METHOD(getVolume:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
-    resolve([NSNumber numberWithDouble:[MPMusicPlayerController applicationMusicPlayer].volume]);
+    if(self.volumeSlider){
+        float val =[self.volumeSlider value];
+        resolve([NSNumber numberWithFloat:val]);
+    }else {
+        resolve([NSNumber numberWithFloat:-1]);
+    }
 }
 
 RCT_EXPORT_METHOD(switchWifi){
@@ -79,6 +86,14 @@ RCT_EXPORT_METHOD(isWifiEnabled:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
                                                  selector:@selector(volumeChanged:)
                                                      name:@"AVSystemController_SystemVolumeDidChangeNotification"
                                                    object:nil];
+        
+        MPVolumeView *volumeView = [[MPVolumeView alloc] init];
+        for (UIView *view in [volumeView subviews]) {
+            if ([view.class.description isEqualToString:@"MPVolumeSlider"]) {
+                self.volumeSlider = (UISlider *)view;
+                break;
+            }
+        }
     }
     return self;
 }
